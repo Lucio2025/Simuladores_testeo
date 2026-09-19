@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour
     [Header("Auto-destrucción")]
     [SerializeField] private float tiempoDeVida = 30f;
 
+    private Rigidbody rb;
     private float tiempoDeDisparo;
     private float velocidadInicial;
     private float anguloDeLanzamiento;
@@ -13,6 +14,11 @@ public class Projectile : MonoBehaviour
     private Vector3 posicionAnterior;
     private float distanciaRecorridaReal = 0f;
     private bool yaImpacto = false;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     public void Inicializar(float velocidad, Vector3 direccionDisparo)
     {
@@ -36,8 +42,7 @@ public class Projectile : MonoBehaviour
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
         {
-            Color colorAleatorio = new Color(Random.value, Random.value, Random.value);
-            renderer.material.color = colorAleatorio; // renderer.material ya crea una instancia propia, no pisa el prefab
+            renderer.material.color = new Color(Random.value, Random.value, Random.value);
         }
     }
 
@@ -55,31 +60,23 @@ public class Projectile : MonoBehaviour
         yaImpacto = true;
 
         float tiempoDeVuelo = Time.time - tiempoDeDisparo;
-        float distanciaLineaRecta = Vector3.Distance(posicionInicial, transform.position);
-        Rigidbody rb = GetComponent<Rigidbody>();
-        float velocidadImpacto = rb.linearVelocity.magnitude;
+        Vector3 puntoDeImpacto = collision.contacts[0].point;
 
-        Debug.Log($"[IMPACTO] Objeto golpeado: {collision.gameObject.name}");
-        Debug.Log($"Tiempo de vuelo: {tiempoDeVuelo:F2} s");
-        Debug.Log($"Velocidad de salida: {velocidadInicial:F2} u/s");
-        Debug.Log($"Velocidad al impactar: {velocidadImpacto:F2} u/s");
-        Debug.Log($"Ángulo de lanzamiento: {anguloDeLanzamiento:F1}°");
-        Debug.Log($"Distancia recorrida (trayectoria real): {distanciaRecorridaReal:F2} u");
-        Debug.Log($"Distancia en línea recta (inicio-impacto): {distanciaLineaRecta:F2} u");
-        Debug.Log($"Punto de impacto: {collision.contacts[0].point}");
+        // Datos que pide la consigna: velocidad relativa e impulso, directo del motor de física
+        float velocidadRelativa = collision.relativeVelocity.magnitude;
+        float impulso = collision.impulse.magnitude;
 
-        // Actualiza el panel de UI, si existe uno en la escena
-        if (DebugUIManager.Instance != null)
+        Debug.Log($"[IMPACTO] {collision.gameObject.name} | Vuelo: {tiempoDeVuelo:F2}s | " +
+                   $"Vel. relativa: {velocidadRelativa:F2} | Impulso: {impulso:F2}");
+
+        if (ShotReportManager.Instance != null)
         {
-            DebugUIManager.Instance.MostrarDatosDeImpacto(
+            ShotReportManager.Instance.RegistrarImpacto(
                 collision.gameObject.name,
                 tiempoDeVuelo,
-                velocidadInicial,
-                velocidadImpacto,
-                anguloDeLanzamiento,
-                distanciaRecorridaReal,
-                distanciaLineaRecta,
-                collision.contacts[0].point
+                puntoDeImpacto,
+                velocidadRelativa,
+                impulso
             );
         }
     }

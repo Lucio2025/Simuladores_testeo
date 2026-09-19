@@ -133,6 +133,11 @@ public class CannonController : MonoBehaviour
 
     public void Disparar()
     {
+        if (ShotReportManager.Instance != null)
+        {
+            ShotReportManager.Instance.IniciarSeguimientoDeTiro();
+        }
+
         GameObject bala = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
         Rigidbody rb = bala.GetComponent<Rigidbody>();
