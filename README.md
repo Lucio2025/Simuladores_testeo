@@ -31,3 +31,15 @@ Prototipo de simulador balístico desarrollado como Trabajo Práctico. El jugado
 | Botón DISPARAR | Lanza el proyectil |
 
 | Botón REGENERAR CAJAS | Reconstruye la pared de objetivos |
+
+## Criterios de evaluación cubiertos
+
+- **Controles de disparo en pantalla**: ángulo (vertical y horizontal) y fuerza con Sliders; masa seleccionable con Slider.
+- **Disparo físico**: proyectil con `Rigidbody` y `Collider`, lanzado con `AddForce` (`ForceMode.Impulse`) según el ángulo y la masa configurados.
+- **Escena de objetivos**: pared de cajas armada con `Rigidbody` + `FixedJoint`, ancladas a una base fija (`Kinematic`), estable desde el arranque.
+- **Registro del resultado**: tiempo de vuelo, punto de impacto, velocidad relativa e impulso de colisión (calculados con datos nativos de `Collision` de Unity), y piezas derribadas por tiro.
+- **Reporte final**: panel en pantalla con los datos del tiro y la puntuación obtenida, tras cada disparo.
+
+## Versión de Unity
+
+`Unity 6000.3.19f1`
